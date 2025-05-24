@@ -26,7 +26,7 @@ const Homepage = () => {
 
       <div className="flex flex-col justify-center items-center mt-[4rem]">
         <h3 className="font-[inconsolata] font-extrabold text-5xl">LOGIN</h3>
-        <div className="flex gap-4 items-center mt-[5rem]">
+        <div className="flex flex-col gap-4 items-center mt-[5rem] sm:flex-row">
           <label
             className="font-[inconsolata] font-bold text-xl"
             htmlFor="device-id"
@@ -35,7 +35,7 @@ const Homepage = () => {
           </label>
           <input
             id="device-id"
-            className="outline-none w-[20rem] h-[3rem] pl-3 bg-white rounded-[10px]"
+            className="outline-none max-w-[20rem] h-[3rem] pl-3 bg-white rounded-[10px]"
             type="text"
           />
         </div>

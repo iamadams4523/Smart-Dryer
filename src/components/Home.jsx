@@ -71,7 +71,7 @@ function Home() {
   };
 
   return (
-    <div className="bg-green-800 flex justify-center items-center w-screen h-screen">
+    <div className=" flex justify-center items-center w-screen h-screen bg-green-800">
       <div className="bg-white dark:bg-gray-900 text-black dark:text-white w-[60rem] h-[37rem] rounded-[12px] transition-colors duration-300 grid grid-cols-[20%_80%] grid-rows-[15%_85%]">
         <div className="border-b border-r rounded-tl-[10px] flex justify-center items-center">
           <img className="w-[10rem]" src={LogoImg} alt="Logo" />
@@ -90,19 +90,12 @@ function Home() {
           </div>
         </div>
 
-        <div className="border-r rounded-bl-[10px]">
-          <div className="flex justify-center items-center gap-2 mt-6">
-            <FaLaptopCode />
-            <p className="font-[Inder] font-normal text-base">Dashboard</p>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-br-[10px]">
-          <h3 className="font-[Inder] font-extrabold text-[20px] ml-6">
-            Live Data Overview
+        <div className="border-r rounded-bl-[10px] flex flex-col items-center">
+          <h3 className="font-[Inder] font-extrabold text-[20px] mt-4 ml-3">
+            Optimal Drying Conditions
           </h3>
-          <div className="flex w-[90%] gap-4">
-            <div className="border border-gray-300 p-2 flex flex-col mt-3 rounded-2xl pl-5 w-[45%]">
+          <div className="flex flex-col w-[90%] gap-4">
+            <div className="border border-gray-300 p-2 flex flex-col mt-3 rounded-2xl pl-5 w-full">
               <p className="font-[Inder] text-[14px] font-semibold">
                 Temperature
               </p>
@@ -114,7 +107,7 @@ function Home() {
                 <p>Safe</p>
               </div>
             </div>
-            <div className="border border-gray-300 p-2 flex flex-col mt-3 rounded-2xl pl-5 w-[45%]">
+            <div className="border border-gray-300 p-2 flex flex-col mt-3 rounded-2xl pl-5 w-full">
               <p className="font-[Inder] text-[14px] font-semibold ">
                 Humidity
               </p>
@@ -124,6 +117,40 @@ function Home() {
               <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
                 <FaCheckCircle className="text-green-700" />
                 <p>Safe</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-br-[10px]">
+          <div className="flex flex-col w-[90%] gap-4">
+            <h3 className="font-[Inder] mt-4 font-extrabold text-[20px] ml-6">
+              Live Data Overview
+            </h3>
+            <div className="flex w-full gap-4">
+              <div className="border border-gray-300 p-2 flex flex-col rounded-2xl pl-5 w-[45%]">
+                <p className="font-[Inder] text-[14px] font-semibold">
+                  Temperature
+                </p>
+                <p className="font-[Inconsolata] font-extrabold text-[40px]">
+                  135°c
+                </p>
+                <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
+                  <FaCheckCircle className="text-green-700" />
+                  <p>Safe</p>
+                </div>
+              </div>
+              <div className="border border-gray-300 p-2 flex flex-col rounded-2xl pl-5 w-[45%]">
+                <p className="font-[Inder] text-[14px] font-semibold ">
+                  Humidity
+                </p>
+                <p className="font-[Inconsolata] font-extrabold text-[40px]">
+                  22%
+                </p>
+                <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
+                  <FaCheckCircle className="text-green-700" />
+                  <p>Safe</p>
+                </div>
               </div>
             </div>
           </div>

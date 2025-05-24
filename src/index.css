@@ -122,3 +122,16 @@
 .bg-hero {
   background-image: url('./assets/background.png');
 }
+
+/* responsive.css */
+
+@media (max-width: 640px) {
+  .input-group {
+  }
+
+  .input-group input {
+  }
+
+  .submit-button {
+  }
+}
