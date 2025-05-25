@@ -102,10 +102,6 @@ function Home() {
                 <p className="font-[Inconsolata] font-extrabold text-[40px]">
                   135°c
                 </p>
-                <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
-                  <FaCheckCircle className="text-green-700" />
-                  <p>Safe</p>
-                </div>
               </div>
               <div className="border border-gray-300 p-2 flex flex-col mt-3 rounded-2xl pl-5 w-full">
                 <p className="font-[Inder] text-[14px] font-semibold ">
@@ -114,10 +110,6 @@ function Home() {
                 <p className="font-[Inconsolata] font-extrabold text-[40px]">
                   22%
                 </p>
-                <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
-                  <FaCheckCircle className="text-green-700" />
-                  <p>Safe</p>
-                </div>
               </div>
             </div>
           </div>
@@ -160,15 +152,15 @@ function Home() {
                 Real-Time Graphs
               </p>
 
-              <div className="mt-2 flex items-center justify-center gap-4">
-                <div className="w-[30%] h-[7rem] flex flex-col justify-center items-center border border-gray-300 rounded-xl p-2 gap-3">
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="w-full h-[7rem] flex flex-col justify-center items-center border border-gray-300 rounded-xl p-2 gap-3">
                   <p className="font-[Inder] text-[14px] font-bold">
                     Temperature & Humidity
                   </p>
                   <img className="w-[95%]" src={GraphImg} alt="" />
                 </div>
 
-                <div className="w-[30%] h-[7rem] flex flex-col justify-center items-center border border-gray-300 rounded-xl p-2 gap-1">
+                <div className="w-full h-[7rem] flex flex-col justify-center items-center border border-gray-300 rounded-xl p-2 gap-1">
                   <p className="font-[Inder] text-[14px] font-bold">
                     Drying Process
                   </p>
@@ -182,7 +174,7 @@ function Home() {
                   </div>
                 </div>
 
-                <div className="w-[30%] h-[7rem] flex flex-col border border-gray-300 rounded-xl p-2">
+                <div className="w-full h-[7rem] flex flex-col border border-gray-300 rounded-xl p-2">
                   <p className="font-[Inder] text-[14px] font-bold text-center">
                     Status
                   </p>
@@ -204,7 +196,7 @@ function Home() {
               </div>
             </div>
 
-            <div className="w-full flex justify-center items-center mt-5">
+            <div className="w-full flex justify-center items-center mt-5 mb-5 sm:mb-0">
               <div className="w-[60%] flex flex-col justify-center items-center">
                 <h3 className="font-[Inder] font-semibold text-base text-center">
                   Control Panel
@@ -303,6 +295,22 @@ function Home() {
                           />
                         </div>
                       </div>
+                      <div className="flex flex-col gap-4 justify-center items-center">
+                        <div className="flex flex-col mt-5">
+                          <label
+                            className="font-[inconsolata] font-bold text-sm"
+                            htmlFor="humidity"
+                          >
+                            Time(mins)
+                          </label>
+                          <input
+                            id="humidity"
+                            className="outline w-[7rem] h-[1.5rem] pl-3 bg-white rounded-[7px]"
+                            type="text"
+                          />
+                        </div>
+                      </div>
+
                       <div
                         onClick={() => {
                           setRunning(true);
