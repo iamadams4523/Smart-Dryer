@@ -46,8 +46,10 @@ function Home() {
       .get('https://sds-3ix7.onrender.com/api/sensor-data')
       .then((response) => {
         const data = response.data;
+        console.log(data);
         if (data?.sensor) setSensors(data.sensor);
         if (data?.optimal) setOptimal(data.optimal);
+        if (data?.timer) setRunning(data.timer);
         if ('fan_state' in data) setFanState(data.fan_state);
         if ('heater_state' in data) setHeaterState(data.heater_state);
         if ('drying_state' in data) setDryingState(data.drying_state);
