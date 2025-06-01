@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import LogoImg from '../assets/Automa.png';
 import GraphImg from '../assets/ChatGPT Image Apr 7, 2025, 12_16_55 AM.png';
 import BarImg from '../assets/ChatGPT Image Apr 7, 2025, 12_16_55 AM 1.png';
@@ -22,16 +23,39 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
-const fruitsItems = ['corn', 'Banana', 'Yam', 'Beans', 'Mango'];
-const drynessItems = ['Dry', 'Mildy Dry', 'Very Dry'];
-
 function Home() {
   const [isDark, setIsDark] = useState(false);
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
+  const [sensors, setSensors] = useState({});
+  const [optimal, setOptimal] = useState({});
+  const [fanState, setFanState] = useState(0);
+  const [heaterState, setHeaterState] = useState(0);
+  const [dryingState, setDryingState] = useState(0);
+  const [temperature, setTemperature] = useState('');
+  const [humidity, setHumidity] = useState('');
+  const [inputTime, setinputTime] = useState('');
+  const [dryMode, setDryMode] = useState('');
+  const [dryLevel, setDryLevel] = useState('');
+  const fruitsItems = ['corn', 'Banana', 'Yam', 'Beans', 'Mango'];
+  const drynessItems = ['Dry', 'Mildy Dry', 'Very Dry'];
 
   // Load theme preference on mount
   useEffect(() => {
+    axios
+      .get('https://sds-3ix7.onrender.com/api/sensor-data')
+      .then((response) => {
+        const data = response.data;
+        if (data?.sensor) setSensors(data.sensor);
+        if (data?.optimal) setOptimal(data.optimal);
+        if ('fan_state' in data) setFanState(data.fan_state);
+        if ('heater_state' in data) setHeaterState(data.heater_state);
+        if ('drying_state' in data) setDryingState(data.drying_state);
+      })
+      .catch((error) => {
+        console.error('Error fetching users:', error);
+      });
+
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme === 'dark') {
       setIsDark(true);
@@ -47,6 +71,11 @@ function Home() {
 
     return () => clearInterval(interval);
   }, [running]);
+
+  useEffect(() => {
+    console.log('Updated sensors:', sensors);
+    console.log('Updated optimal:', optimal);
+  }, [sensors, optimal]);
 
   const formatTime = (timeInSeconds) => {
     const hours = Math.floor(timeInSeconds / 3600);
@@ -68,6 +97,63 @@ function Home() {
     }
   };
 
+  const handleCustom = async (e) => {
+    e.preventDefault();
+
+    const tempNum = Number(temperature);
+    const humidityNum = Number(humidity);
+    const timeNum = Number(inputTime);
+
+    if (isNaN(tempNum) || isNaN(humidityNum) || isNaN(timeNum)) {
+      alert('Please enter valid numbers');
+      return;
+    }
+
+    const data = {
+      type: 'custom',
+      temperature: tempNum,
+      humidity: humidityNum,
+      time: timeNum,
+    };
+
+    try {
+      const response = await axios.post(
+        'https://sds-3ix7.onrender.com/api/send-command',
+        data
+      );
+      console.log('Response:', response.data);
+      alert('Data sent successfully!');
+    } catch (error) {
+      console.error('Error sending data:', error);
+      alert('Failed to send data');
+    }
+  };
+
+  const handlePredefined = async () => {
+    if (!dryMode || !dryLevel) {
+      alert('Please select both drying mode and dryness level.');
+      return;
+    }
+
+    const data = {
+      type: 'predefined',
+      drying_level: dryLevel,
+      dry_mode: dryMode,
+    };
+
+    try {
+      const response = await axios.post(
+        'https://sds-3ix7.onrender.com/api/send-command',
+        data
+      );
+      console.log('Response:', response.data);
+      alert('Data sent successfully!');
+    } catch (error) {
+      console.error('Error sending data:', error);
+      alert('Failed to send data');
+    }
+  };
+
   return (
     <div className=" flex justify-center items-center w-screen h-screen sm:bg-green-800">
       <div className="bg-white dark:bg-gray-900 text-black dark:text-white w-full h-full sm:w-[60rem] sm:h-[37rem] rounded-[12px] transition-colors duration-300 ">
@@ -81,8 +167,14 @@ function Home() {
           <div className="flex items-center">
             <div className="flex justify-center items-center gap-4 ml-auto mr-5">
               <div className="flex items-center gap-1">
-                <div className="w-[12px] h-[12px] bg-green-800 rounded-full"></div>
-                <p className="font-[Inder] font-normal text-base">Running</p>
+                <div
+                  className={`w-[12px] h-[12px] rounded-full ${
+                    heaterState ? 'bg-green-500' : 'bg-red-800'
+                  }`}
+                ></div>
+                <p className="font-[Inder] font-normal text-base">
+                  {heaterState ? 'Online' : 'Offline'}
+                </p>
               </div>
               <Switch checked={isDark} onCheckedChange={handleToggle} />
             </div>
@@ -100,7 +192,7 @@ function Home() {
                   Temperature
                 </p>
                 <p className="font-[Inconsolata] font-extrabold text-[40px]">
-                  135°c
+                  {optimal.temp}°c
                 </p>
               </div>
               <div className="border border-gray-300 p-2 flex flex-col mt-3 rounded-2xl pl-5 w-full">
@@ -108,7 +200,7 @@ function Home() {
                   Humidity
                 </p>
                 <p className="font-[Inconsolata] font-extrabold text-[40px]">
-                  22%
+                  {optimal.humid}%
                 </p>
               </div>
             </div>
@@ -125,7 +217,7 @@ function Home() {
                     Temperature
                   </p>
                   <p className="font-[Inconsolata] font-extrabold text-[40px]">
-                    135°c
+                    {sensors.temp}°c
                   </p>
                   <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
                     <FaCheckCircle className="text-green-700" />
@@ -137,7 +229,7 @@ function Home() {
                     Humidity
                   </p>
                   <p className="font-[Inconsolata] font-extrabold text-[40px]">
-                    22%
+                    {sensors.humid}%
                   </p>
                   <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
                     <FaCheckCircle className="text-green-700" />
@@ -168,9 +260,9 @@ function Home() {
                     {formatTime(time)}
                   </h2>
                   <div className="flex items-center gap-2">
-                    <p className="font-[Inder] text-[14px]">Drying</p>
-                    <Switch />
                     <p className="font-[Inder] text-[14px]">Not Drying</p>
+                    <Switch checked={!!dryingState} />
+                    <p className="font-[Inder] text-[14px]">Drying</p>
                   </div>
                 </div>
 
@@ -180,16 +272,21 @@ function Home() {
                   </p>
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-1 items-center">
-                      <h2 className="text-[13px] font-semibold  self-start">
+                      <h2 className="text-[13px] font-semibold self-start">
                         Fan status
                       </h2>
-                      <Slider defaultValue={[33]} max={100} step={1} />
+                      <Slider value={[fanState]} max={100} step={1} disabled />
                     </div>
                     <div className="flex flex-col gap-1 items-center">
                       <h2 className="text-[13px] font-semibold self-start">
                         Heater status
                       </h2>
-                      <Slider defaultValue={[33]} max={100} step={2} />
+                      <Slider
+                        value={[heaterState]}
+                        max={100}
+                        step={1}
+                        disabled
+                      />
                     </div>
                   </div>
                 </div>
@@ -217,7 +314,7 @@ function Home() {
                         <h2 className="text-[13px] font-semibold ml-3 self-start">
                           Drying Mode
                         </h2>
-                        <Select>
+                        <Select onValueChange={setDryMode}>
                           <SelectTrigger className="w-[160px]">
                             <SelectValue placeholder="Fruits" />
                           </SelectTrigger>
@@ -234,7 +331,7 @@ function Home() {
                         <h2 className="text-[13px] font-semibold ml-3 self-start">
                           Dryness Level
                         </h2>
-                        <Select>
+                        <Select onValueChange={setDryLevel}>
                           <SelectTrigger className="w-[160px]">
                             <SelectValue placeholder="dryness level" />
                           </SelectTrigger>
@@ -248,9 +345,7 @@ function Home() {
                         </Select>
                       </div>
                       <div
-                        onClick={() => {
-                          setRunning(true);
-                        }}
+                        onClick={handlePredefined}
                         className="font-[inconsolata] font-bold text-sm text-white text-center px-1 py-1 bg-green-400 mt-7 rounded-[10px] cursor-pointer"
                       >
                         Submit
@@ -265,7 +360,10 @@ function Home() {
                       </p>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <div className="flex flex-col justify-center items-center">
+                      <form
+                        onSubmit={handleCustom}
+                        className="flex flex-col items-center gap-6"
+                      >
                         <div className="flex flex-col">
                           <label
                             className="font-[inconsolata] font-bold text-sm"
@@ -277,11 +375,12 @@ function Home() {
                             id="temperature"
                             className="outline w-[7rem] h-[1.5rem] pl-3 bg-white rounded-[7px]"
                             type="text"
+                            value={temperature}
+                            onChange={(e) => setTemperature(e.target.value)}
                           />
                         </div>
-                      </div>
-                      <div className="flex flex-col gap-4 justify-center items-center">
-                        <div className="flex flex-col mt-5">
+
+                        <div className="flex flex-col">
                           <label
                             className="font-[inconsolata] font-bold text-sm"
                             htmlFor="humidity"
@@ -292,33 +391,34 @@ function Home() {
                             id="humidity"
                             className="outline w-[7rem] h-[1.5rem] pl-3 bg-white rounded-[7px]"
                             type="text"
+                            value={humidity}
+                            onChange={(e) => setHumidity(e.target.value)}
                           />
                         </div>
-                      </div>
-                      <div className="flex flex-col gap-4 justify-center items-center">
-                        <div className="flex flex-col mt-5">
+
+                        <div className="flex flex-col">
                           <label
                             className="font-[inconsolata] font-bold text-sm"
-                            htmlFor="humidity"
+                            htmlFor="time"
                           >
-                            Time(mins)
+                            Time (mins)
                           </label>
                           <input
-                            id="humidity"
+                            id="time"
                             className="outline w-[7rem] h-[1.5rem] pl-3 bg-white rounded-[7px]"
                             type="text"
+                            value={inputTime}
+                            onChange={(e) => setinputTime(e.target.value)}
                           />
                         </div>
-                      </div>
 
-                      <div
-                        onClick={() => {
-                          setRunning(true);
-                        }}
-                        className="font-[inconsolata] font-bold text-sm text-white text-center px-1 py-1 bg-green-400 mt-7 rounded-[10px] cursor-pointer"
-                      >
-                        Submit
-                      </div>
+                        <button
+                          type="submit"
+                          className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        >
+                          Submit
+                        </button>
+                      </form>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
