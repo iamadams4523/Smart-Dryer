@@ -37,8 +37,10 @@ function Home() {
   const [inputTime, setinputTime] = useState('');
   const [dryMode, setDryMode] = useState('');
   const [dryLevel, setDryLevel] = useState('');
-  const fruitsItems = ['corn', 'Banana', 'Yam', 'Beans', 'Mango'];
+  const fruitsItems = ['Grain', 'Vegetable', 'Meat'];
   const drynessItems = ['Dry', 'Mildy Dry', 'Very Dry'];
+  const isTempSafe = sensors.temp <= optimal.temp;
+  const isHumidSafe = sensors.humid <= optimal.humid;
 
   // Load theme preference on mount
   useEffect(() => {
@@ -79,13 +81,13 @@ function Home() {
     console.log('Updated optimal:', optimal);
   }, [sensors, optimal]);
 
-  const formatTime = (timeInSeconds) => {
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+  // const formatTime = (timeInSeconds) => {
+  //   const hours = Math.floor(timeInSeconds / 3600);
+  //   const minutes = Math.floor((timeInSeconds % 3600) / 60);
 
-    return `${String(hours).padStart(2, '0')}:
-    ${String(minutes).padStart(2, '0')}`;
-  };
+  //   return `${String(hours).padStart(2, '0')}:
+  //   ${String(minutes).padStart(2, '0')}`;
+  // };
 
   // Toggle HTML class and save preference
   const handleToggle = (checked) => {
@@ -221,21 +223,45 @@ function Home() {
                   <p className="font-[Inconsolata] font-extrabold text-[40px]">
                     {sensors.temp}°c
                   </p>
-                  <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
-                    <FaCheckCircle className="text-green-700" />
-                    <p>Safe</p>
+                  <div
+                    className={`w-fit ${
+                      isTempSafe ? 'bg-green-100' : 'bg-red-100'
+                    } rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3`}
+                  >
+                    <FaCheckCircle
+                      className={isTempSafe ? 'text-green-700' : 'text-red-700'}
+                    />
+                    <p
+                      className={isTempSafe ? 'text-green-700' : 'text-red-700'}
+                    >
+                      {isTempSafe ? 'Safe' : 'Unsafe'}
+                    </p>
                   </div>
                 </div>
                 <div className="border border-gray-300 p-2 flex flex-col rounded-2xl pl-5 w-full">
-                  <p className="font-[Inder] text-[14px] font-semibold ">
+                  <p className="font-[Inder] text-[14px] font-semibold">
                     Humidity
                   </p>
                   <p className="font-[Inconsolata] font-extrabold text-[40px]">
                     {sensors.humid}%
                   </p>
-                  <div className="w-fit bg-green-100 rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3">
-                    <FaCheckCircle className="text-green-700" />
-                    <p>Safe</p>
+                  <div
+                    className={`w-fit ${
+                      isHumidSafe ? 'bg-green-100' : 'bg-red-100'
+                    } rounded-[10px] px-6 py-0.5 flex items-center justify-center gap-3`}
+                  >
+                    <FaCheckCircle
+                      className={
+                        isHumidSafe ? 'text-green-700' : 'text-red-700'
+                      }
+                    />
+                    <p
+                      className={
+                        isHumidSafe ? 'text-green-700' : 'text-red-700'
+                      }
+                    >
+                      {isHumidSafe ? 'Safe' : 'Unsafe'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -258,9 +284,7 @@ function Home() {
                   <p className="font-[Inder] text-[14px] font-bold">
                     Drying Process
                   </p>
-                  <h2 className="font-[inder] font-bold text-2xl">
-                    {formatTime(time)}
-                  </h2>
+                  <h2 className="font-[inder] font-bold text-2xl">{running}</h2>
                   <div className="flex items-center gap-2">
                     <p className="font-[Inder] text-[14px]">Not Drying</p>
                     <Switch checked={!!dryingState} />
@@ -318,7 +342,7 @@ function Home() {
                         </h2>
                         <Select onValueChange={setDryMode}>
                           <SelectTrigger className="w-[160px]">
-                            <SelectValue placeholder="Fruits" />
+                            <SelectValue placeholder="Mode" />
                           </SelectTrigger>
                           <SelectContent>
                             {fruitsItems.map((fruit, index) => (
