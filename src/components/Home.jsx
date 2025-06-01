@@ -25,8 +25,7 @@ import { Slider } from '@/components/ui/slider';
 
 function Home() {
   const [isDark, setIsDark] = useState(false);
-  const [time, setTime] = useState(0);
-  const [running, setRunning] = useState(false);
+  const [running, setRunning] = useState(0);
   const [sensors, setSensors] = useState({});
   const [optimal, setOptimal] = useState({});
   const [fanState, setFanState] = useState(0);
@@ -42,6 +41,11 @@ function Home() {
   const isTempSafe = sensors.temp <= optimal.temp;
   const isHumidSafe = sensors.humid <= optimal.humid;
 
+  const hmsToSeconds = (timeStr) => {
+    const [h, m, s] = timeStr.split(':').map(Number);
+    return h * 3600 + m * 60 + s;
+  };
+
   // Load theme preference on mount
   useEffect(() => {
     axios
@@ -51,7 +55,10 @@ function Home() {
         console.log(data);
         if (data?.sensor) setSensors(data.sensor);
         if (data?.optimal) setOptimal(data.optimal);
-        if (data?.timer) setRunning(data.timer);
+        if (data?.timer) {
+          const totalSeconds = hmsToSeconds(data.timer);
+          setRunning(totalSeconds);
+        }
         if ('fan_state' in data) setFanState(data.fan_state);
         if ('heater_state' in data) setHeaterState(data.heater_state);
         if ('drying_state' in data) setDryingState(data.drying_state);
@@ -65,31 +72,41 @@ function Home() {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     }
-    let interval;
-
-    if (running) {
-      interval = setInterval(() => {
-        setTime((prev) => prev + 1);
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [running]);
+  }, []);
 
   useEffect(() => {
     console.log('Updated sensors:', sensors);
     console.log('Updated optimal:', optimal);
   }, [sensors, optimal]);
 
-  // const formatTime = (timeInSeconds) => {
-  //   const hours = Math.floor(timeInSeconds / 3600);
-  //   const minutes = Math.floor((timeInSeconds % 3600) / 60);
+  useEffect(() => {
+    if (running <= 0) return;
 
-  //   return `${String(hours).padStart(2, '0')}:
-  //   ${String(minutes).padStart(2, '0')}`;
-  // };
+    const interval = setInterval(() => {
+      setRunning((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-  // Toggle HTML class and save preference
+    return () => clearInterval(interval);
+  }, [running]);
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return [
+      hrs.toString().padStart(2, '0'),
+      mins.toString().padStart(2, '0'),
+      secs.toString().padStart(2, '0'),
+    ].join(':');
+  };
+
   const handleToggle = (checked) => {
     setIsDark(checked);
     if (checked) {
@@ -284,7 +301,9 @@ function Home() {
                   <p className="font-[Inder] text-[14px] font-bold">
                     Drying Process
                   </p>
-                  <h2 className="font-[inder] font-bold text-2xl">{running}</h2>
+                  <h2 className="font-[inder] font-bold text-2xl">
+                    {formatTime(running)}
+                  </h2>
                   <div className="flex items-center gap-2">
                     <p className="font-[Inder] text-[14px]">Not Drying</p>
                     <Switch checked={!!dryingState} />
